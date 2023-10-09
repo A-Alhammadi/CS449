@@ -10,11 +10,13 @@ public class SOSGameTest {
     public void setUp() {
         game = new SOSGame(4);  // Choose a board size
     }
+
     // Choose a board size
     @Test
     public void testChooseBoardSize() {
         Assert.assertEquals(4, game.getBoardSize());
     }
+
     // Start a new game
     @Test
     public void testStartNewGame() {
@@ -25,6 +27,7 @@ public class SOSGameTest {
         }
         Assert.assertEquals('S', game.getTurn());
     }
+
     // Make a move in a simple game
     @Test
     public void testMakeMoveInSimpleGame() {
@@ -36,6 +39,7 @@ public class SOSGameTest {
         Assert.assertEquals(SOSGame.Cell.O, game.getCell(0, 1));
         Assert.assertEquals('S', game.getTurn());
     }
+
     // Invalid moves should not change the turn or affect the board
     @Test
     public void testInvalidMove() {
@@ -52,4 +56,6 @@ public class SOSGameTest {
         Assert.assertEquals('O', game.getTurn());
         Assert.assertEquals(SOSGame.Cell.S, game.getCell(0, 0));
     }
+
+   
 }

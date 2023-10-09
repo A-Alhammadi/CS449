@@ -1,11 +1,14 @@
 import java.util.Scanner;
 
 public class SOSConsole {
+
     private SOSGame game;  // Game instance
+
     // Constructor: Initialize with game instance
     public SOSConsole(SOSGame game) {
         this.game = game;
     }
+
     // Display the game board on console
     public void displayBoard() {
         // Print each cell in the board
@@ -20,12 +23,14 @@ public class SOSConsole {
             System.out.print("----");
         }
     }
+
     // Convert cell value to display symbol
     private char symbol(SOSGame.Cell cell) {
         if (cell == SOSGame.Cell.S) return 'S';
         else if (cell == SOSGame.Cell.O) return 'O';
         else return ' ';  // Empty cell
     }
+
     // Main game loop for console-based gameplay
     public void play() {
         Scanner in = new Scanner(System.in);
@@ -47,6 +52,7 @@ public class SOSConsole {
             }
         }
     }
+
     // Main method to start the console game
     public static void main(String[] args) {
         SOSConsole console = new SOSConsole(new SOSGame(4));  // Create game for a 4x4 board

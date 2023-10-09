@@ -5,14 +5,16 @@ import javax.swing.*;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class SosGUITest {
 
     private SosGUI gui;
 
     @Before
-    public void setUp() {
-        // Running GUI code in the EDT (Event Dispatch Thread)
-        SwingUtilities.invokeLater(() -> {
+    public void setUp() throws Exception {
+        // Running GUI code in the Event Dispatch Thread
+        SwingUtilities.invokeAndWait(() -> {
             gui = new SosGUI();
         });
     }

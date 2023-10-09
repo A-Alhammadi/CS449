@@ -64,7 +64,7 @@ public class SosGUI {
         turnLabel = new JLabel("Turn: Blue");
         turnLabel.setForeground(Color.BLUE);
         bottomPanel.add(turnLabel);
-        
+
         // Add panels to frame
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(boardPanel, BorderLayout.CENTER);
@@ -72,6 +72,7 @@ public class SosGUI {
 
         frame.setVisible(true);
     }
+
     // Update board UI when board size changes
     public void reconstructBoardUI() {
         int newSize;
@@ -97,6 +98,7 @@ public class SosGUI {
         frame.repaint();
         toggleTurn();
     }
+
     // Initialize board buttons
     private void initBoardButtons() {
         for (int i = 0; i < boardSize; i++) {
@@ -108,6 +110,7 @@ public class SosGUI {
             }
         }
     }
+
     // Listener for board buttons
     private class ButtonListener implements ActionListener {
         private int row, column;
@@ -116,6 +119,7 @@ public class SosGUI {
             this.row = row;
             this.column = column;
         }
+
         // Handle button clicks
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -125,6 +129,7 @@ public class SosGUI {
             boardButtons[row][column].setEnabled(false);  // Disable button after move
         }
     }
+
     // Update turn display
     private void toggleTurn() {
         if (game.getTurn() == 'S') {
@@ -135,6 +140,7 @@ public class SosGUI {
             turnLabel.setForeground(Color.BLUE);
         }
     }
+
     // Main method: Launch the GUI
     public static void main(String[] args) {
         new SosGUI();
