@@ -13,6 +13,22 @@ public class SosGUI {
     private int boardSize = 4;  // default board size
     private JPanel boardPanel;  // Declare this outside to access it easily
 
+    public int getBoardSize() {
+        return boardSize;
+    }
+
+    public SOSGame getGame() {
+        return game;
+    }
+
+    public JLabel getTurnLabel() {
+        return turnLabel;
+    }
+
+    public JTextField getBoardSizeField() {
+        return boardSizeField;
+    }
+    
     public SosGUI() {
         game = new SOSGame(boardSize);
 
@@ -63,7 +79,7 @@ public class SosGUI {
         frame.setVisible(true);
     }
 
-    private void reconstructBoardUI() {
+    public void reconstructBoardUI() {
         int newSize;
         try {
             newSize = Integer.parseInt(boardSizeField.getText().trim());
