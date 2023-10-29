@@ -191,6 +191,8 @@ public class SosGUI extends JFrame {
 
                 if (game.isGameOver()) {
                     determineWinner();
+                } else if (game.getGameMode() == SOSGameBase.GameMode.SIMPLE && game.wasLastMoveSOS()) {
+                    determineWinner();
                 } else {
                     toggleTurn();
                 }
@@ -204,13 +206,14 @@ public class SosGUI extends JFrame {
         int blueScore = game.getScore('S');
         int redScore = game.getScore('O');
         if (blueScore > redScore) {
-            JOptionPane.showMessageDialog(SosGUI.this, "Blue wins!");
+            JOptionPane.showMessageDialog(SosGUI.this, "Blue wins with " + blueScore + " points!");
         } else if (redScore > blueScore) {
-            JOptionPane.showMessageDialog(SosGUI.this, "Red wins!");
+            JOptionPane.showMessageDialog(SosGUI.this, "Red wins with " + redScore + " points!");
         } else {
-            JOptionPane.showMessageDialog(SosGUI.this, "It's a draw!");
+            JOptionPane.showMessageDialog(SosGUI.this, "It's a draw with both players scoring " + blueScore + " points!");
         }
     }
+
 
    
 

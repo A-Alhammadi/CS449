@@ -15,6 +15,7 @@ public abstract class SOSGameBase {
     protected char turn; // Current player's turn (S or O)
     protected GameMode gameMode; // Game mode
     protected Map<Character, Integer> scores; // Map to store player scores
+    protected boolean lastMoveSOS = false;
 
     public SOSGameBase(int n, GameMode gameMode) {
         this.n = n;
@@ -36,6 +37,45 @@ public abstract class SOSGameBase {
             }
         }
     }
+    
+    protected boolean checkForSOS(int row, int column, char letter) {
+        boolean foundSOS = false;
+
+        // Check each direction (Horizontal, Vertical, 2 Diagonals)
+        for (int[] direction : new int[][] {{0, 1}, {1, 0}, {1, 1}, {1, -1}}) {
+            foundSOS |= checkDirection(row, column, direction[0], direction[1], letter);
+        }
+
+        return foundSOS;
+    }
+
+    private boolean checkDirection(int row, int column, int dr, int dc, char letter) {
+        Cell current = getCell(row, column);
+
+        // Check if the current cell is the first in SOS sequence
+        if (current == Cell.S && getCell(row + dr, column + dc) == Cell.O && getCell(row + 2*dr, column + 2*dc) == Cell.S) {
+            scores.put(letter, scores.get(letter) + 1);
+            return true;
+        }
+        
+        // Check if the current cell is the second in SOS sequence
+        if (current == Cell.O && getCell(row - dr, column - dc) == Cell.S && getCell(row + dr, column + dc) == Cell.S) {
+            scores.put(letter, scores.get(letter) + 1);
+            return true;
+        }
+
+        // Check if the current cell is the third in SOS sequence
+        if (current == Cell.S && getCell(row - dr, column - dc) == Cell.O && getCell(row - 2*dr, column - 2*dc) == Cell.S) {
+            scores.put(letter, scores.get(letter) + 1);
+            return true;
+        }
+
+        return false;
+    }
+
+
+
+
 
     public int getBoardSize() {
         return n;
@@ -45,9 +85,10 @@ public abstract class SOSGameBase {
         if (row >= 0 && row < n && column >= 0 && column < n) {
             return grid[row][column];
         } else {
-            return null;
+            return Cell.EMPTY; // return EMPTY instead of null for out-of-bounds
         }
     }
+
     public void setBlueChoice(char choice) {
         if (choice == 'S' || choice == 'O') {
             blueChoice = choice;
@@ -58,6 +99,10 @@ public abstract class SOSGameBase {
             redChoice = choice;
         }
     }
+    public boolean wasLastMoveSOS() {
+        return lastMoveSOS;
+    }
+
     public char getTurn() {
         return turn;
     }
@@ -71,7 +116,7 @@ public abstract class SOSGameBase {
             this.turn = newTurn;
         }
     }
-    public abstract void makeMove(int row, int column, char letter);
+    public abstract boolean makeMove(int row, int column, char letter);
 
     public abstract boolean isGameOver();
 

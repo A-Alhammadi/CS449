@@ -1,4 +1,3 @@
-
 public class SOSGeneralGame extends SOSGameBase {
 
     public SOSGeneralGame(int n) {
@@ -6,19 +5,25 @@ public class SOSGeneralGame extends SOSGameBase {
     }
 
     @Override
-    public void makeMove(int row, int column, char letter) {
+    public boolean makeMove(int row, int column, char letter) {
         if (row >= 0 && row < n && column >= 0 && column < n && grid[row][column] == Cell.EMPTY) {
             grid[row][column] = (letter == 'S') ? Cell.S : Cell.O;
-            if (!checkForSOS(row, column) || getGameMode() == GameMode.SIMPLE) {
+            if (super.checkForSOS(row, column, letter)) {
+                lastMoveSOS = true;
+                scores.put(turn, scores.get(turn) + 1);
+                return true;
+            } else {
+                lastMoveSOS = false;
                 turn = (turn == 'S') ? 'O' : 'S';
+                return false;
             }
         }
+        return false;
     }
-
 
     @Override
     public boolean isGameOver() {
-        return isBoardFull();
+        return isBoardFull(); // Game ends only when the board is full.
     }
 
     private boolean isBoardFull() {
@@ -30,34 +35,5 @@ public class SOSGeneralGame extends SOSGameBase {
             }
         }
         return true;
-    }
-    private boolean checkDirection(int row, int column, int rowInc, int colInc) {
-        // Check one direction from the cell for an SOS. 
-        // If an SOS is found, return true.
-        
-        try {
-            if (grid[row][column] == Cell.S
-                && grid[row + rowInc][column + colInc] == Cell.O
-                && grid[row + 2*rowInc][column + 2*colInc] == Cell.S) {
-                return true;
-            }
-            if (grid[row][column] == Cell.S
-                && grid[row - rowInc][column - colInc] == Cell.O
-                && grid[row - 2*rowInc][column - 2*colInc] == Cell.S) {
-                return true;
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // This will catch any index errors (like trying to check outside the grid boundaries).
-            return false;
-        }
-        return false;
-    }
-
-    private boolean checkForSOS(int row, int column) {
-        // Check horizontally, vertically, and diagonally.
-        return checkDirection(row, column, 0, 1)  // Horizontal
-            || checkDirection(row, column, 1, 0)  // Vertical
-            || checkDirection(row, column, 1, 1)  // Diagonal from top-left to bottom-right
-            || checkDirection(row, column, 1, -1); // Diagonal from top-right to bottom-left
     }
 }
