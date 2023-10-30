@@ -1,3 +1,4 @@
+package SOSgame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -206,9 +207,12 @@ public class SosGUI extends JFrame {
         int blueScore = game.getScore('S');
         int redScore = game.getScore('O');
         if (blueScore > redScore) {
-            JOptionPane.showMessageDialog(SosGUI.this, "Blue wins with " + blueScore + " points!");
+           // JOptionPane.showMessageDialog(SosGUI.this, "Blue wins with " + blueScore + " points!");
+        	JOptionPane.showMessageDialog(SosGUI.this, "Blue wins");
         } else if (redScore > blueScore) {
-            JOptionPane.showMessageDialog(SosGUI.this, "Red wins with " + redScore + " points!");
+            //JOptionPane.showMessageDialog(SosGUI.this, "Red wins with " + redScore + " points!");
+        	JOptionPane.showMessageDialog(SosGUI.this, "Red wins");
+
         } else {
             JOptionPane.showMessageDialog(SosGUI.this, "It's a draw with both players scoring " + blueScore + " points!");
         }

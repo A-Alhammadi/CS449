@@ -1,3 +1,4 @@
+package SOSgame;
 public class SOSSimpleGame extends SOSGameBase {
 
     private boolean gameOver;

@@ -1,3 +1,4 @@
+package SOSgame;
 public class SOSGeneralGame extends SOSGameBase {
 
     public SOSGeneralGame(int n) {
