@@ -5,22 +5,24 @@ public class SOSGeneralGame extends SOSGameBase {
         super(n, GameMode.GENERAL);
     }
 
+    
     @Override
     public boolean makeMove(int row, int column, char letter) {
         if (row >= 0 && row < n && column >= 0 && column < n && grid[row][column] == Cell.EMPTY) {
             grid[row][column] = (letter == 'S') ? Cell.S : Cell.O;
-            if (super.checkForSOS(row, column, letter)) {
+            if (super.checkForSOS(row, column, turn)) {
                 lastMoveSOS = true;
-                scores.put(turn, scores.get(turn) + 1);
                 return true;
             } else {
                 lastMoveSOS = false;
-                turn = (turn == 'S') ? 'O' : 'S';
+                turn = (turn == 'S') ? 'O' : 'S'; // This line should be here
                 return false;
             }
         }
+        
         return false;
     }
+
 
     @Override
     public boolean isGameOver() {

@@ -107,28 +107,31 @@ public class SosGUI extends JFrame {
     private void setTurn(char letter) {
         if (game != null) {
             game.setTurn(letter);
-            toggleTurn();
+            updateTurnDisplay();
         }
     }
     
  // Update turn display
-    private void toggleTurn() {
+    private void updateTurnDisplay() {
         int blueScore = game.getScore('S');
         int redScore = game.getScore('O');
-        scoreLabel.setText("Blue: " + blueScore + " | Red: " + redScore); // Update the score label
+        scoreLabel.setText("Blue: " + blueScore + " | Red: " + redScore);
 
         if (game.getTurn() == 'S') {
-            SwingUtilities.invokeLater(() -> {
-                turnLabel.setText("Turn: Red");
-                turnLabel.setForeground(Color.RED);
-            });
-        } else {
             SwingUtilities.invokeLater(() -> {
                 turnLabel.setText("Turn: Blue");
                 turnLabel.setForeground(Color.BLUE);
             });
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                turnLabel.setText("Turn: Red");
+                turnLabel.setForeground(Color.RED);
+            });
         }
     }
+
+
+
 
  // Update board UI when board size changes
     public void reconstructBoardUI() {
@@ -157,7 +160,7 @@ public class SosGUI extends JFrame {
             add(boardPanel, BorderLayout.CENTER);
             revalidate();
             repaint();
-            toggleTurn();
+            updateTurnDisplay();
         });
     }
 
@@ -189,13 +192,11 @@ public class SosGUI extends JFrame {
                 boardButtons[row][column].setText(String.valueOf(currentChoice));
                 game.makeMove(row, column, currentChoice);
                 boardButtons[row][column].setEnabled(false);
-
+                
                 if (game.isGameOver()) {
                     determineWinner();
-                } else if (game.getGameMode() == SOSGameBase.GameMode.SIMPLE && game.wasLastMoveSOS()) {
-                    determineWinner();
                 } else {
-                    toggleTurn();
+                    updateTurnDisplay();  // Only update the display here, don't toggle
                 }
             }
         }

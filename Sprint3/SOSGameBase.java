@@ -30,6 +30,16 @@ public abstract class SOSGameBase {
         scores.put('O', 0);
         initGame();
     }
+    public char getWinner() {
+        if (scores.get('S') > scores.get('O')) {
+            return 'S'; // Red
+        } else if (scores.get('S') < scores.get('O')) {
+            return 'O'; // Blue
+        } else {
+            return ' ';  // Indicates a tie
+        }
+    }
+
 
     protected void initGame() {
         for (int row = 0; row < n; row++) {
@@ -39,25 +49,26 @@ public abstract class SOSGameBase {
         }
     }
     
-    protected boolean checkForSOS(int row, int column, char letter) {
+    protected boolean checkForSOS(int row, int column, char currentPlayer) {
         int totalSOSFound = 0;
 
         // Check each direction (Horizontal, Vertical, 2 Diagonals)
         for (int[] direction : new int[][] {{0, 1}, {1, 0}, {1, 1}, {1, -1}}) {
-            if (checkDirection(row, column, direction[0], direction[1], letter)) {
+            if (checkDirection(row, column, direction[0], direction[1])) {
                 totalSOSFound++;
             }
         }
 
         if (totalSOSFound > 0) {
-            scores.put(letter, scores.get(letter) + totalSOSFound);
+            scores.put(currentPlayer, scores.get(currentPlayer) + totalSOSFound);
             return true;
         }
 
         return false;
     }
 
-    private boolean checkDirection(int row, int column, int dr, int dc, char letter) {
+
+    private boolean checkDirection(int row, int column, int dr, int dc) {
         Cell current = getCell(row, column);
 
         // Check if the current cell is the first in SOS sequence
