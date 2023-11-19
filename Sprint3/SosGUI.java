@@ -15,6 +15,8 @@ public class SosGUI extends JFrame {
     private int boardSize = 4;  // Default size
     private JPanel boardPanel;  // Holds board buttons
     private char currentChoice;
+    private boolean isAgainstComputer;
+    private JButton playerButton, computerButton;
 
  // Constructor: Set up GUI components
     public SosGUI() {
@@ -31,7 +33,24 @@ public class SosGUI extends JFrame {
         boardSizeField.setText(String.valueOf(boardSize));
         JButton applyBoardSizeButton = new JButton("Apply Board Size");
         applyBoardSizeButton.addActionListener(e -> reconstructBoardUI());
+        
+        playerButton = new JButton("Player");
+        computerButton = new JButton("Computer");
+        topPanel.add(new JLabel("Opponent:"));
+        topPanel.add(playerButton);
+        topPanel.add(computerButton);
 
+        playerButton.addActionListener(e -> {
+            isAgainstComputer = false;
+            System.out.println("Player mode selected");
+            restartGame();
+        });        
+        computerButton.addActionListener(e -> {
+            isAgainstComputer = true;
+            System.out.println("Computer mode selected");
+            restartGame();
+        });
+        
         topPanel.add(new JLabel("SOS"));  // Adding components to top panel
         topPanel.add(simpleGameButton);
         topPanel.add(generalGameButton);
@@ -85,18 +104,28 @@ public class SosGUI extends JFrame {
 
     // Create a new simple game instance
     private void createSimpleGame() {
-        game = new SOSSimpleGame(boardSize);
+        boardSize = Integer.parseInt(boardSizeField.getText().trim()); // Get the current board size
+        if (isAgainstComputer) {
+            game = new AutoSOSGame(boardSize, SOSGameBase.GameMode.SIMPLE, 'S'); // Assuming 'S' for the computer
+            handleComputerFirstMove();
+        } else {
+            game = new SOSSimpleGame(boardSize);
+        }
         gameModeLabel.setText("Game Mode: Simple");
         startGame();
     }
-
     // Create a new general game instance
     private void createGeneralGame() {
-        game = new SOSGeneralGame(boardSize);
+        boardSize = Integer.parseInt(boardSizeField.getText().trim()); // Get the current board size
+        if (isAgainstComputer) {
+            game = new AutoSOSGame(boardSize, SOSGameBase.GameMode.GENERAL, 'S'); // Assuming 'S' for the computer
+            handleComputerFirstMove();
+        } else {
+            game = new SOSGeneralGame(boardSize);
+        }
         gameModeLabel.setText("Game Mode: General");
         startGame();
     }
-
     // Common method to start a new game
     private void startGame() {
         boardSize = game.getBoardSize();
@@ -104,6 +133,23 @@ public class SosGUI extends JFrame {
         reconstructBoardUI();
     }
     
+    private void restartGame() {
+        // Keep the current game mode
+        SOSGameBase.GameMode currentMode = game != null ? game.getGameMode() : SOSGameBase.GameMode.SIMPLE;
+        
+        if (currentMode == SOSGameBase.GameMode.SIMPLE) {
+            createSimpleGame();
+        } else {
+            createGeneralGame();
+        }
+    }
+    private void handleComputerFirstMove() {
+        if (game instanceof AutoSOSGame) {
+            AutoSOSGame autoGame = (AutoSOSGame) game;
+            autoGame.makeAutoMove();
+            updateBoardAfterComputerMove(autoGame);
+        }
+    }
     private void setTurn(char letter) {
         if (game != null) {
             game.setTurn(letter);
@@ -129,9 +175,6 @@ public class SosGUI extends JFrame {
             });
         }
     }
-
-
-
 
  // Update board UI when board size changes
     public void reconstructBoardUI() {
@@ -193,16 +236,35 @@ public class SosGUI extends JFrame {
                 game.makeMove(row, column, currentChoice);
                 boardButtons[row][column].setEnabled(false);
                 
+                // Handle computer move if playing against computer
+                if (isAgainstComputer) {
+                    handleComputerMove();
+                }
+
                 if (game.isGameOver()) {
                     determineWinner();
                 } else {
-                    updateTurnDisplay();  // Only update the display here, don't toggle
+                    updateTurnDisplay();
                 }
             }
         }
+        
+        private void handleComputerMove() {
+            if (game instanceof AutoSOSGame) {
+                AutoSOSGame autoGame = (AutoSOSGame) game;
+                autoGame.makeAutoMove();
+                SwingUtilities.invokeLater(() -> {
+                    updateBoardAfterComputerMove(autoGame);
+                    if (autoGame.isGameOver()) {
+                        determineWinner();
+                    } else {
+                        updateTurnDisplay();
+                    }
+                });
+            }
+        }
 
-
-    }
+  
     // Determine the winner when the game is over
     private void determineWinner() {
         int blueScore = game.getScore('S');
@@ -218,20 +280,34 @@ public class SosGUI extends JFrame {
             JOptionPane.showMessageDialog(SosGUI.this, "It's a draw with both players scoring " + blueScore + " points!");
         }
     }
+    
+ // Update board UI to reflect the move made by the computer
+    private void updateBoardAfterComputerMove(AutoSOSGame autoGame) {
+        for (int row = 0; row < boardSize; row++) {
+            for (int col = 0; col < boardSize; col++) {
+                SOSGameBase.Cell cell = autoGame.getCell(row, col);
+                JButton button = boardButtons[row][col];
+                
+                if (!button.isEnabled() && cell != SOSGameBase.Cell.EMPTY) {
+                    // Update button text to reflect the move made by the computer
+                    button.setText(cell == SOSGameBase.Cell.S ? "S" : "O");
+                    button.setEnabled(false); // Disable the button as the move is done
+                }
+            }
+        }
 
-
-   
-
+        // Check for game over after computer move
+        if (autoGame.isGameOver()) {
+            determineWinner();
+        } else {
+            updateTurnDisplay();
+        }
+    }
  // Main method: Launch the GUI
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new SosGUI();
         });
     }
-    
+    }
 }
-    
-
-
-
-
