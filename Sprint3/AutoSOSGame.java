@@ -10,7 +10,12 @@ public class AutoSOSGame extends SOSGameBase {
         super(size, gameMode);
         this.autoPlayer = autoPlayer;
         this.random = new Random();
-        if (autoPlayer == 'S' || autoPlayer == 'O') {
+
+        // Initialize the game state
+        initGame();
+
+        // If it's the computer's turn, make the first move.
+        if (this.turn == this.autoPlayer) {
             makeFirstAutoMove();
         }
     }
@@ -41,6 +46,10 @@ public class AutoSOSGame extends SOSGameBase {
 
     private void makeFirstAutoMove() {
         makeRandomMove(autoPlayer);
+        // After making the move, switch the turn if needed.
+        if (!wasLastMoveSOS() || gameMode == GameMode.SIMPLE) {
+            setTurn(autoPlayer == 'S' ? 'O' : 'S');
+        }
     }
 
     @Override

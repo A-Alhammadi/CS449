@@ -2,10 +2,13 @@ package SOSgame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
+
 
 @SuppressWarnings("serial")
 public class SosGUI extends JFrame {
 
+	private JButton startButton;
     private JButton[][] boardButtons;  // Board buttons
     private JButton blueS, blueO, redS, redO;
     private JTextField boardSizeField;
@@ -18,15 +21,23 @@ public class SosGUI extends JFrame {
     private boolean isAgainstComputer;
     private JButton playerButton, computerButton;
     private char autoPlayer; // Represents the computer player ('S' or 'O')
+    private JLabel playerModeLabel;
+    private JComboBox<String> playerModeComboBox;
 
 
  // Constructor: Set up GUI components
     public SosGUI() {
+    	
     	 super("SOS");  // Main window setup
     	 setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
          setSize(600, 600);
          currentChoice = 'S';
-
+         startButton = new JButton("Start Game");
+         this.add(startButton);
+         playerModeLabel = new JLabel("Select Player Mode:");
+         playerModeComboBox = new JComboBox<>(new String[] {"Player vs Player", "Player vs Computer", "Computer vs Computer"});
+         this.add(playerModeLabel);
+         this.add(playerModeComboBox);
         // Set up top control panel
         JPanel topPanel = new JPanel();
         simpleGameButton = new JButton("Simple Game");
@@ -105,11 +116,12 @@ public class SosGUI extends JFrame {
     }
 
 
-    // Create a new simple game instance
+ // Create a new simple game instance
     private void createSimpleGame() {
         boardSize = Integer.parseInt(boardSizeField.getText().trim());
         if (isAgainstComputer) {
-            game = new AutoSOSGame(boardSize, SOSGameBase.GameMode.SIMPLE, 'S'); // 'S' for the computer
+            char computerChar = determineComputerChar(); // Determine the character for the computer
+            game = new AutoSOSGame(boardSize, SOSGameBase.GameMode.SIMPLE, computerChar);
             handleComputerFirstMove();
         } else {
             game = new SOSSimpleGame(boardSize);
@@ -117,17 +129,25 @@ public class SosGUI extends JFrame {
         gameModeLabel.setText("Game Mode: Simple");
         startGame();
     }
-    // Create a new general game instance
+ // Create a new general game instance
     private void createGeneralGame() {
         boardSize = Integer.parseInt(boardSizeField.getText().trim());
         if (isAgainstComputer) {
-            game = new AutoSOSGame(boardSize, SOSGameBase.GameMode.GENERAL, 'S'); // 'S' for the computer
+            char computerChar = determineComputerChar(); // Determine the character for the computer
+            game = new AutoSOSGame(boardSize, SOSGameBase.GameMode.GENERAL, computerChar);
             handleComputerFirstMove();
         } else {
             game = new SOSGeneralGame(boardSize);
         }
         gameModeLabel.setText("Game Mode: General");
         startGame();
+    }
+ // Method to determine the character for the computer
+    private char determineComputerChar() {
+        // If the player's choice is available, use the opposite for the computer
+        // If not, randomly select 'S' or 'O' for the computer
+        Random random = new Random();
+        return random.nextBoolean() ? 'S' : 'O';
     }
     // Common method to start a new game
     private void startGame() {
@@ -191,7 +211,21 @@ public class SosGUI extends JFrame {
             JOptionPane.showMessageDialog(SosGUI.this, "It's a draw with both players scoring " + blueScore + " points!");
         }
     }
-
+ // Method to handle the computer's move
+    private void handleComputerMove() {
+        if (game instanceof AutoSOSGame && game.getTurn() == autoPlayer) {
+            AutoSOSGame autoGame = (AutoSOSGame) game;
+            autoGame.makeAutoMove();
+            SwingUtilities.invokeLater(() -> {
+                updateBoardAfterComputerMove(autoGame);
+                if (autoGame.isGameOver()) {
+                    determineWinner();
+                } else {
+                    updateTurnDisplay();
+                }
+            });
+        }
+    }
 	private void setTurn(char letter) {
         if (game != null) {
             game.setTurn(letter);
@@ -290,7 +324,7 @@ public class SosGUI extends JFrame {
                 }
             }
         }
-        
+
         private void handleComputerMove() {
             if (game instanceof AutoSOSGame) {
                 AutoSOSGame autoGame = (AutoSOSGame) game;

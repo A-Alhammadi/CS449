@@ -89,11 +89,6 @@ public abstract class SOSGameBase {
         return false;
     }
 
-
-
-
-
-
     public int getBoardSize() {
         return n;
     }
