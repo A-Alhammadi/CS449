@@ -135,4 +135,5 @@ public abstract class SOSGameBase {
     public int getScore(char player) {
         return scores.get(player);
     }
+	public abstract void makeAutoMove();
 }
