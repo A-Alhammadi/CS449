@@ -25,9 +25,6 @@ public class SOSGeneralGame extends SOSGameBase {
             if (checkForSOS(row, column, turn)) {
                 lastMoveSOS = true;
                 scores.put(turn, scores.get(turn) + 1); // Update score for the player who made the SOS.
-                if (isAgainstComputer && turn == autoPlayer) {
-                    makeAutoMove(); // Auto-move for computer in its turn
-                }
             } else {
                 lastMoveSOS = false;
                 turn = (turn == 'S') ? 'O' : 'S'; // Switch turns
@@ -62,12 +59,25 @@ public class SOSGeneralGame extends SOSGameBase {
             makeRandomMove(autoPlayer);
         }
     }
-
-    @Override
-    public void makeAutoMove() {
-        if (!isGameOver() && turn == autoPlayer) {
-            makeRandomMove(autoPlayer);
+    
+@Override
+    public void makeAutoMove(char currentMove) {
+        if (!isGameOver() && turn == currentMove) {
+            makeRandomMove(currentMove);
+            
         }
+    }
+
+    public boolean isValidMoveForAutoPlayer(char player) {
+        // Check if there is any empty cell available
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (grid[row][col] == Cell.EMPTY) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void makeRandomMove(char player) {

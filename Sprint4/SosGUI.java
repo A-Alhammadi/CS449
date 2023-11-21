@@ -149,31 +149,26 @@ public class SosGUI extends JFrame {
     // Common method to start a new game
     private void startGame() {
         // Update isAgainstComputer flag based on the current selection
-        String selectedMode = (String) modeSelectionComboBox.getSelectedItem();
-        isAgainstComputer = selectedMode.contains("Computer");
-        
+        isAgainstComputer = isComputerVsComputer() || isAgainstComputer;
+
         // Set board size and update game mode label
         boardSize = Integer.parseInt(boardSizeField.getText().trim());
-        
+
         // Reconstruct the UI with the new board size
         reconstructBoardUI();
-        
-        // Initiate the first move if it's a game involving a computer
-        if (isAgainstComputer) {
+
+        if (isComputerVsComputer()) {
+            handleComputerVsComputerGame();
+        } else if (isAgainstComputer) {
             handleComputerFirstMove();
         }
     }
 
 
     private void handleComputerFirstMove() {
-        if (isAgainstComputer) {
-            game.makeAutoMove();
-            SwingUtilities.invokeLater(() -> {
-                updateBoardAfterComputerMove();
-                if (isComputerVsComputer() && !game.isGameOver()) {
-                    handleComputerMove(); // Only for computer vs computer mode
-                }
-            });
+        if (isAgainstComputer && !isComputerVsComputer()) {
+            game.makeAutoMove(currentChoice);
+            SwingUtilities.invokeLater(this::updateBoardAfterComputerMove);
         }
     }
 
@@ -213,29 +208,40 @@ public class SosGUI extends JFrame {
     }
  // Method to handle the computer's move
     private void handleComputerMove() {
-        if (isComputerVsComputer()) {
-            new Thread(() -> {
-                while (!game.isGameOver()) {
-                    game.makeAutoMove();
-                    // Update the UI after each move on the EDT
-                    SwingUtilities.invokeLater(this::updateBoardAfterComputerMove);
-                    // Wait a bit for visibility
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                }
-                // Handle game over on the EDT
-                SwingUtilities.invokeLater(this::determineWinner);
-            }).start();
-        } else if (isAgainstComputer) {
-            game.makeAutoMove();
+        if (isAgainstComputer) {
+            game.makeAutoMove(currentChoice);
             SwingUtilities.invokeLater(this::updateBoardAfterComputerMove);
         }
     }
 
+    private void handleComputerVsComputerGame() {
+        new Thread(() -> {
+            char currentMove = 'S'; // Starting with 'S', alternates between 'S' and 'O'
+            while (!game.isGameOver()) {
+                if (game.isValidMoveForAutoPlayer(currentMove)) {
+                    game.makeAutoMove(currentMove); // Pass the currentMove to makeAutoMove
+                    currentMove = currentMove == 'S' ? 'O' : 'S'; // Alternate the move
+                }
+                updateBoardForAutoMove();
+                try {
+                    Thread.sleep(500); // Delay for visibility
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+            SwingUtilities.invokeLater(this::determineWinner);
+        }).start();
+    }
+
+    private void updateBoardForAutoMove() {
+        SwingUtilities.invokeLater(() -> {
+            updateBoardAfterComputerMove();
+            if (game.isGameOver()) {
+                determineWinner();
+            }
+        });
+    }
  // Update turn display
     private void updateTurnDisplay() {
         int blueScore = game.getScore('S');

@@ -107,8 +107,10 @@ public abstract class SOSGameBase {
 
     public abstract boolean makeMove(int row, int column, char letter);
     public abstract boolean isGameOver();
-    public abstract void makeAutoMove();
+    public abstract void makeAutoMove(char currentMove);
     public int getScore(char player) {
         return scores.getOrDefault(player, 0);
     }
+
+	protected abstract boolean isValidMoveForAutoPlayer(char currentMove);
 }
