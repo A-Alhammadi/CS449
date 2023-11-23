@@ -42,6 +42,19 @@ public class SOSSimpleGame extends SOSGameBase {
     private boolean isValidMove(int row, int column) {
         return row >= 0 && row < n && column >= 0 && column < n && grid[row][column] == Cell.EMPTY;
     }
+    
+    public boolean isValidMoveForAutoPlayer(char player) {
+        // In the Simple Game, as long as there is an empty cell, a move can be made.
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (grid[row][col] == Cell.EMPTY) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public boolean isGameOver() {
@@ -55,11 +68,13 @@ public class SOSSimpleGame extends SOSGameBase {
     }
 
     @Override
-    public void makeAutoMove() {
-        if (!isGameOver() && turn == autoPlayer) {
-            makeRandomMove(autoPlayer);
+    public void makeAutoMove(char currentMove) {
+        if (!isGameOver() && turn == currentMove) {
+            makeRandomMove(currentMove);
+            // In the Simple Game, the game might end after each move, so no further action is needed here.
         }
     }
+
 
     private void makeRandomMove(char player) {
         int emptyCells = getNumberOfEmptyCells();
