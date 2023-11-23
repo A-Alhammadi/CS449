@@ -9,12 +9,14 @@ public class SOSSimpleGame extends SOSGameBase {
     private final Random random = new Random();
     private final boolean isComputerVsComputer;
 
-    public SOSSimpleGame(int size, boolean isAgainstComputer, char autoPlayerChar, boolean isComputerVsComputer) {
+    public SOSSimpleGame(int size, boolean isAgainstComputer, char autoPlayerChar, char playerChar, boolean isComputerVsComputer) {
         super(size, GameMode.SIMPLE);
         this.isAgainstComputer = isAgainstComputer;
         this.autoPlayer = autoPlayerChar;
         this.isComputerVsComputer = isComputerVsComputer;
-
+        if (isAgainstComputer) {
+            this.turn = playerChar;
+        }
         initGame();
         if (this.isAgainstComputer && this.turn == this.autoPlayer) {
             makeFirstAutoMove();
@@ -70,12 +72,16 @@ public class SOSSimpleGame extends SOSGameBase {
     @Override
     public void makeAutoMove(char currentMove) {
         if (!isGameOver() && turn == currentMove) {
-            makeRandomMove(currentMove);
-            // In the Simple Game, the game might end after each move, so no further action is needed here.
+            // Randomly choose between 'S' and 'O' for each auto move
+            char randomChoice = random.nextBoolean() ? 'S' : 'O';
+            makeRandomMove(randomChoice);
+            
+            if (!gameOver) {
+                turn = (turn == 'S') ? 'O' : 'S';
+            }
         }
     }
-
-
+    
     private void makeRandomMove(char player) {
         int emptyCells = getNumberOfEmptyCells();
         if (emptyCells > 0) {

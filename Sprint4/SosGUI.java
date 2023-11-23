@@ -21,6 +21,8 @@ public class SosGUI extends JFrame {
    // private char autoPlayer; // Represents the computer player ('S' or 'O')
     private JLabel modeSelectionLabel;
     private JComboBox<String> modeSelectionComboBox;
+    private JComboBox<String> computerColorComboBox;
+
 
     public SosGUI() {
         super("SOS");  // Main window setup
@@ -42,11 +44,19 @@ public class SosGUI extends JFrame {
             "General Computer vs Computer"
         });
         modeSelectionComboBox.addActionListener(e -> {
-            updateMode();
+            restartGame();
         });
         topPanel.add(modeSelectionLabel);
         topPanel.add(modeSelectionComboBox);
 
+        computerColorComboBox = new JComboBox<>(new String[]{"Computer as Blue", "Computer as Red"});
+        computerColorComboBox.addActionListener(e -> {
+            restartGame();
+        });
+        
+        topPanel.add(new JLabel("Computer Color:"));
+        topPanel.add(computerColorComboBox);
+        
         // Board size configuration
         boardSizeField = new JTextField(5);
         boardSizeField.setText(String.valueOf(boardSize));
@@ -96,11 +106,26 @@ public class SosGUI extends JFrame {
     private void updateMode() {
         String selectedMode = (String) modeSelectionComboBox.getSelectedItem();
         isAgainstComputer = selectedMode.contains("Computer");
-        char computerChar = determineComputerChar();
+
+        char computerChar = 'S'; // Default values
+        char playerChar = 'O';   // Default values
+
+        if (selectedMode.contains("Player vs Computer")) {
+            boolean isComputerBlue = computerColorComboBox.getSelectedItem().equals("Computer as Blue");
+            computerChar = isComputerBlue ? 'S' : 'O';
+            playerChar = isComputerBlue ? 'O' : 'S';
+        } 
+
         boardSize = parseBoardSize();
         game = selectedMode.startsWith("Simple") ? 
-               new SOSSimpleGame(boardSize, isAgainstComputer, computerChar, isComputerVsComputer()) :
-               new SOSGeneralGame(boardSize, isAgainstComputer, computerChar, isComputerVsComputer());
+               new SOSSimpleGame(boardSize, isAgainstComputer, computerChar, playerChar, isComputerVsComputer()) :
+               new SOSGeneralGame(boardSize, isAgainstComputer, computerChar, playerChar, isComputerVsComputer());
+    }
+
+    
+    private void restartGame() {
+        updateMode();
+        reconstructBoardUI();
         startGame();
     }
 
@@ -119,43 +144,24 @@ public class SosGUI extends JFrame {
         }
     }
 
- // Create a new simple game instance
-    private void createSimpleGame(boolean isAgainstComputer, char computerChar) {
-        boardSize = Integer.parseInt(boardSizeField.getText().trim());
-        boolean isCompVsComp = isComputerVsComputer();
-        game = new SOSSimpleGame(boardSize, isAgainstComputer, computerChar, isCompVsComp);
-        startGame();
-    }
-
-    // Create a new general game instance
-    private void createGeneralGame(boolean isAgainstComputer, char computerChar) {
-        boardSize = Integer.parseInt(boardSizeField.getText().trim());
-        boolean isCompVsComp = isComputerVsComputer();
-        game = new SOSGeneralGame(boardSize, isAgainstComputer, computerChar, isCompVsComp);
-        startGame();
-    }
-
     private boolean isComputerVsComputer() {
         String selectedMode = (String) modeSelectionComboBox.getSelectedItem();
         return selectedMode.equals("Simple Computer vs Computer") || selectedMode.equals("General Computer vs Computer");
     }
- // Method to determine the character for the computer
-    private char determineComputerChar() {
-        // If the player's choice is available, use the opposite for the computer
-        // If not, randomly select 'S' or 'O' for the computer
-        Random random = new Random();
-        return random.nextBoolean() ? 'S' : 'O';
-    }
     // Common method to start a new game
     private void startGame() {
-        // Update isAgainstComputer flag based on the current selection
-        isAgainstComputer = isComputerVsComputer() || isAgainstComputer;
+        // Clear the board
+        for (JButton[] buttonRow : boardButtons) {
+            for (JButton button : buttonRow) {
+                button.setText("");
+                button.setEnabled(true);
+            }
+        }
 
-        // Set board size and update game mode label
-        boardSize = Integer.parseInt(boardSizeField.getText().trim());
-
-        // Reconstruct the UI with the new board size
-        reconstructBoardUI();
+        // Update score and turn labels
+        scoreLabel.setText("Blue: 0 | Red: 0");
+        turnLabel.setText(game.getTurn() == 'S' ? "Turn: Blue" : "Turn: Red");
+        turnLabel.setForeground(game.getTurn() == 'S' ? Color.BLUE : Color.RED);
 
         if (isComputerVsComputer()) {
             handleComputerVsComputerGame();
