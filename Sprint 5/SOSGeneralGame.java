@@ -10,7 +10,7 @@ public class SOSGeneralGame extends SOSGameBase {
     private final char autoPlayer; // 'S' or 'O'
     private final boolean isAgainstComputer;
     private final Random random = new Random();
-    private final boolean isComputerVsComputer;
+    //private final boolean isComputerVsComputer;
     private boolean isReplayMode = false;
 
    // protected List<GameMove> moveList = new ArrayList<>();
@@ -20,7 +20,7 @@ public class SOSGeneralGame extends SOSGameBase {
         super(size, GameMode.GENERAL);
         this.isAgainstComputer = isAgainstComputer;
         this.autoPlayer = autoPlayerChar;
-        this.isComputerVsComputer = isComputerVsComputer;
+        //this.isComputerVsComputer = isComputerVsComputer;
         if (isAgainstComputer) {
             this.turn = playerChar;
         }

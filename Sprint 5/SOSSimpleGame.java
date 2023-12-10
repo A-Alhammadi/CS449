@@ -9,15 +9,14 @@ public class SOSSimpleGame extends SOSGameBase {
     private final char autoPlayer; // 'S' or 'O'
     private final boolean isAgainstComputer;
     private final Random random = new Random();
-    private final boolean isComputerVsComputer;
+    //private final boolean isComputerVsComputer;
     private boolean isReplayMode = false;
-
 
     public SOSSimpleGame(int size, boolean isAgainstComputer, char autoPlayerChar, char playerChar, boolean isComputerVsComputer) {
         super(size, GameMode.SIMPLE);
         this.isAgainstComputer = isAgainstComputer;
         this.autoPlayer = autoPlayerChar;
-        this.isComputerVsComputer = isComputerVsComputer;
+        //this.isComputerVsComputer = isComputerVsComputer;
         if (isAgainstComputer) {
             this.turn = playerChar;
         }
