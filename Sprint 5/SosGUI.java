@@ -1,5 +1,7 @@
 
 import javax.swing.*;
+import javax.swing.Timer;
+import java.awt.event.ActionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Iterator;
@@ -236,7 +238,7 @@ public class SosGUI extends JFrame {
         new Thread(() -> {
             char currentMove = 'S'; // Starting with 'S', alternates between 'S' and 'O'
             while (!game.isGameOver()) {
-                if (game.isValidMoveForAutoPlayer(currentMove)) {
+                if (!game.isReplayMode() && game.isValidMoveForAutoPlayer(currentMove)) {
                     game.makeAutoMove(currentMove); // Pass the currentMove to makeAutoMove
                     currentMove = currentMove == 'S' ? 'O' : 'S'; // Alternate the move
                 }
@@ -251,6 +253,7 @@ public class SosGUI extends JFrame {
             SwingUtilities.invokeLater(this::determineWinner);
         }).start();
     }
+
 
     private void updateBoardForAutoMove() {
         SwingUtilities.invokeLater(() -> {
@@ -316,24 +319,27 @@ public class SosGUI extends JFrame {
         restartGame();
     }
     private void startReplay() {
-        if (game instanceof SOSSimpleGame) {
-            ((SOSSimpleGame) game).replayMoves();
-        } else if (game instanceof SOSGeneralGame) {
-            ((SOSGeneralGame) game).replayMoves();
-        }
+        game.startReplayMode();  // Notify the game that replay is starting
         Iterator<SOSGameBase.GameMove> moveIterator = game.getMoveList().iterator();
-        int delay = 500; // 1 second between moves
+        int delay = 500; // Delay in milliseconds (0.5 seconds)
 
-        Timer timer = new Timer(delay, e -> {
-            if (moveIterator.hasNext()) {
-                SOSGameBase.GameMove move = moveIterator.next();
-                updateGuiWithMove(move);
-            } else {
-                ((Timer) e.getSource()).stop();
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (moveIterator.hasNext()) {
+                    SOSGameBase.GameMove move = moveIterator.next();
+                    updateGuiWithMove(move);
+                } else {
+                    ((Timer) e.getSource()).stop();
+                    game.endReplayMode();  // Notify the game that replay has ended
+                }
             }
-        });
+        };
+
+        Timer timer = new Timer(delay, actionListener);
         timer.start();
     }
+
     private void updateGuiWithMove(SOSGameBase.GameMove move) {
         JButton button = boardButtons[move.row][move.column];
         button.setText(String.valueOf(move.player));

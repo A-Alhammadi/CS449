@@ -11,6 +11,8 @@ public class SOSGeneralGame extends SOSGameBase {
     private final boolean isAgainstComputer;
     private final Random random = new Random();
     private final boolean isComputerVsComputer;
+    private boolean isReplayMode = false;
+
    // protected List<GameMove> moveList = new ArrayList<>();
 
 
@@ -46,6 +48,14 @@ public class SOSGeneralGame extends SOSGameBase {
         }
         return false;
     }
+    @Override
+    public void startReplayMode() {
+        isReplayMode = true;
+    }
+    @Override
+    public void endReplayMode() {
+        isReplayMode = false;
+    }
 
 
     private boolean isValidMove(int row, int column) {
@@ -76,11 +86,18 @@ public class SOSGeneralGame extends SOSGameBase {
     
     @Override
     public void makeAutoMove(char currentMove) {
+        if (isReplayMode) {
+            // Skip the random move generation and rely on the replay mechanism
+            return;
+        }
+
         if (!isGameOver() && turn == currentMove) {
-            // Randomly choose between 'S' and 'O' for each auto move
             char randomChoice = random.nextBoolean() ? 'S' : 'O';
             makeRandomMove(randomChoice);
         }
+    }
+    public void endReplay() {
+        isReplayMode = false;
     }
 
 
@@ -117,6 +134,8 @@ public class SOSGeneralGame extends SOSGameBase {
     }
     
     public void replayMoves() {
+    	startReplayMode();
+    	isReplayMode = true;
         // Clear the board and reset the game state before replaying
         initGame();
         for (GameMove move : moveList) {
@@ -129,6 +148,7 @@ public class SOSGeneralGame extends SOSGameBase {
             // Update the turn for each move
             turn = move.player;
         }
+        endReplayMode();//maybe move this to GUI
     }
 
     private void applyMoveAtIndex(int moveIndex, char player) {

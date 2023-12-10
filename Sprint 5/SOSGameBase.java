@@ -15,6 +15,7 @@ public abstract class SOSGameBase {
     protected Map<Character, Integer> scores; // Map to store player scores
     protected boolean lastMoveSOS = false;
     protected List<GameMove> moveList = new ArrayList<>();
+    protected boolean isReplayMode = false;
 
     public SOSGameBase(int n, GameMode gameMode) {
         this.n = n;
@@ -132,5 +133,11 @@ public abstract class SOSGameBase {
     }
 
 	protected abstract boolean isValidMoveForAutoPlayer(char currentMove);
+
+	 protected boolean isReplayMode() {
+	        return isReplayMode;
+	    }	protected abstract void startReplayMode();
+    protected abstract void endReplayMode();
+
 
 }
